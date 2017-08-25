@@ -1,0 +1,3 @@
+*.py[cod]
+DjangoAuth/__pycache__
+AuthApp/__pycache__
