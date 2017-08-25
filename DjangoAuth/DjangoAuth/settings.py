@@ -40,8 +40,17 @@ INSTALLED_APPS = [
     'AuthApp.apps.AuthappConfig',
     'rest_framework',
     'rest_framework.authtoken',
-    'corsheaders'
+    'corsheaders',
+    'social_django',
 ]
+
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.github.GithubOAuth2',
+    'social_core.backends.twitter.TwitterOAuth',
+    'social_core.backends.facebook.FacebookOAuth2',
+    'social.backends.google.GoogleOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -136,3 +145,18 @@ REST_FRAMEWORK = {
          'rest_framework.authentication.TokenAuthentication',
     )
 }
+
+LOGIN_URL = 'login'
+LOGOUT_URL = 'logout'
+LOGIN_REDIRECT_URL = 'home'
+
+SOCIAL_AUTH_GITHUB_KEY = '6fce19cc12f1bb83bff8'
+SOCIAL_AUTH_GITHUB_SECRET = '68d1f150493af073bdb799b03db5e5b96542d2f5'
+
+SOCIAL_AUTH_FACEBOOK_KEY = '1503649556347551'  # App ID
+SOCIAL_AUTH_FACEBOOK_SECRET = 'e2965ebca729cad4eebc5781e2b8a843'  # App Secret
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '946051474871-2gf8apvv7s1imhqgecii0f4dg8j411j0.apps.googleusercontent.com' 
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'LV9jNoWelCqO0gesjtMEhR3h' 
+
+#LOGIN_REDIRECT_URL = '/'
