@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
-
+import environ
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -26,6 +26,10 @@ SECRET_KEY = '+31#!3$=v1+!h(1kb6erh5krn*&wxw+@x-_a$^zlv(=+4yav&d'
 DEBUG = True
 
 ALLOWED_HOSTS = []
+
+#Reading the file that stores Enviroinment variables 
+env = environ.Env(DEBUG=(bool, False),)
+environ.Env.read_env('.env')
 
 
 # Application definition
@@ -88,12 +92,12 @@ WSGI_APPLICATION = 'DjangoAuth.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE':'django.db.backends.mysql',
-        'NAME':'django',
-        'USER':'django',
-        'PASSWORD':'django',
-        'HOST':'localhost',
-        'PORT':'3306',
+        'ENGINE':env.str('DATABASE_ENGINE'),
+        'NAME':env.str('DATABASE_NAME'),
+        'USER':env.str('DATABASE_USER'),
+        'PASSWORD':env.str('DATABASE_PASSWORD'),
+        'HOST':env.str('DATABASE_HOST'),
+        'PORT':env.str('DATABASE_PORT'),
     }
 }
 
@@ -150,13 +154,13 @@ LOGIN_URL = 'login'
 LOGOUT_URL = 'logout'
 LOGIN_REDIRECT_URL = 'home'
 
-SOCIAL_AUTH_GITHUB_KEY = '6fce19cc12f1bb83bff8'
-SOCIAL_AUTH_GITHUB_SECRET = '68d1f150493af073bdb799b03db5e5b96542d2f5'
+SOCIAL_AUTH_GITHUB_KEY = env.str('SOCIAL_AUTH_GITHUB_KEY')
+SOCIAL_AUTH_GITHUB_SECRET = env.str('SOCIAL_AUTH_GITHUB_SECRET')
 
-SOCIAL_AUTH_FACEBOOK_KEY = '1503649556347551'  # App ID
-SOCIAL_AUTH_FACEBOOK_SECRET = 'e2965ebca729cad4eebc5781e2b8a843'  # App Secret
+SOCIAL_AUTH_FACEBOOK_KEY = env.str('SOCIAL_AUTH_FACEBOOK_KEY')  # App ID
+SOCIAL_AUTH_FACEBOOK_SECRET = env.str('SOCIAL_AUTH_FACEBOOK_SECRET')
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '946051474871-2gf8apvv7s1imhqgecii0f4dg8j411j0.apps.googleusercontent.com' 
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'LV9jNoWelCqO0gesjtMEhR3h' 
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env.str('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env.str('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET') 
 
 #LOGIN_REDIRECT_URL = '/'

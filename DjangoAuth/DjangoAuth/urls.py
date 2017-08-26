@@ -20,6 +20,8 @@ from AuthApp import views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^login', views.login),
+    url(r'^check', views.ExampleView.as_view()),
+    url(r'^logout', views.logout),
     url(r'^oauth/', include('social_django.urls', namespace='social')),
-    url(r'^$', views.home, name='home'),
+    url(r'^home/$', views.home, name='home'),
 ]
