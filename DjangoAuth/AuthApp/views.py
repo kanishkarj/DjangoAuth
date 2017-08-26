@@ -4,16 +4,42 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_401_UNAUTHORIZED
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from django.http import JsonResponse
 from django.core import serializers
 from django.contrib import auth
+from rest_framework.authentication import TokenAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
+from django.forms import ModelForm
+from .models import Profile
+from django.views.generic import View
+from .serializers import UserToJson
+from django.core.urlresolvers import reverse
 
 @login_required
 def home(request):
-    token, _ = Token.objects.get_or_create(user=request.user)
-    #return Response({"token": token.key})
-    return JsonResponse(token.key, safe=False)
+    content = UserToJson(request.user)
+    return JsonResponse(content, safe=False)
+
+
+class Registration(View):
+    authentication_classes = (TokenAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        if len(str(request.user.profile.bio).strip()) > 0 :
+            return redirect(reverse('home'))
+        else:
+            return render(request, 'registration.html', {"user":request.user}) 
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        user.profile.bio = request.POST.get('bio')
+        user.profile.address = request.POST.get('address')
+        user.profile.birth_date = request.POST.get('dob')
+        user.save()
+        return redirect(reverse('home'))
 
 @api_view(["POST"])
 def login(request):
@@ -30,23 +56,6 @@ def login(request):
 def logout(request):
     auth.logout(request)
     return JsonResponse({"token": "dgdfh"})    
-
-from rest_framework.authentication import TokenAuthentication, BasicAuthentication
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework.views import APIView
-
-class ExampleView(APIView):
-    authentication_classes = (TokenAuthentication, BasicAuthentication)
-    permission_classes = (IsAuthenticated,)
-
-    def get(self, request, format=None):
-        content = {
-            'user': str(request.user),  # `django.contrib.auth.User` instance.
-            'auth': str(request.auth),  # None
-        }
-        return Response(content)
-
 
 def check(request):
     #token, _ = Token.objects.get_or_create(user=user)
