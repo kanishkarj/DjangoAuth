@@ -17,13 +17,21 @@ from django.views.generic import View
 from .serializers import UserToJson
 from django.core.urlresolvers import reverse
 from django.core.mail import EmailMessage
+from django.contrib.auth.models import User
+from rest_framework import generics
+from .serializers import UserSignUpSerializer
 
+class UserCreateView(generics.ListCreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSignUpSerializer
+
+    def perform_create(self, serializer):
+        serializer.save()
 
 @login_required
 def home(request):
     content = UserToJson(request.user)
-    email = EmailMessage('subject', 'body of the message', 'noreply@bottlenose.co', ['vitor@freitas.com'])
-    email.send()
+    
     return JsonResponse(content, safe=False)
 
 
@@ -45,6 +53,27 @@ class Registration(View):
         user.profile.birth_date = request.POST.get('dob')
         user.save()
         return redirect(reverse('home'))
+
+
+@api_view(["POST"])
+def signup(request):
+    
+    try :
+        user = User.objects.create_user(
+                                username=request.data.get('username'),
+                                email=request.POST.get('email'),
+                                password=request.POST.get('password'),
+                                first_name = request.POST.get('first_name'),
+                                last_name = request.POST.get('last_name'),
+                                )
+    except Exception as e:
+        return JsonResponse(str(e), safe=False)
+
+    email = EmailMessage('subject', 'body of the message', 'noreply@bottlenose.co', ['vitor@freitas.com'])
+    email.send()
+    
+    content = UserToJson(user)
+    return JsonResponse(content, safe=False)
 
 @api_view(["POST"])
 def login(request):

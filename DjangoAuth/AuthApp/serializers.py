@@ -12,12 +12,17 @@ class ProfileSerializer(serializers.ModelSerializer):
         
 class UserSerializer(serializers.ModelSerializer):
     """Serializer to map the Model instance into JSON format."""
-    profile = ProfileSerializer(many=False, read_only=True)
 
     class Meta:
         """Meta class to map serializer's fields with the model fields."""
         model = User
-        fields = ('username','firstname','lastname','email','profile')
+        fields = ('username','first_name','last_name','email')
+
+class UserSignUpSerializer(serializers.ModelSerializer):
+    class Meta:
+        """Meta class to map serializer's fields with the model fields."""
+        model = User
+        fields = ('username','first_name','last_name','email','password')
 
 def UserToJson(user):
     content = {
