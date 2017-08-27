@@ -20,6 +20,7 @@ def sendActivationMail(user):
                     'token': account_activation_token.make_token(user),
                 })
     mail_subject = 'Activate your account.'
+    print(message)
     to_email = user.email
     email = EmailMessage(mail_subject, message, to=[to_email])
     email.send() 

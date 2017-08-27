@@ -29,6 +29,10 @@ from django.utils.encoding import force_bytes, force_text
 
 @login_required
 def home(request):
+    if request.user.is_active == False :
+            sendActivationMail(request.user)
+            return HttpResponse('Please verify your email address before you proceed')
+    
     content = UserToJson(request.user)
     return JsonResponse(content, safe=False)
 
@@ -54,7 +58,8 @@ class Registration(View):
     def get(self, request, *args, **kwargs):
         
         if request.user.is_active == False :
-            print("hello")
+            sendActivationMail(request.user)
+            return HttpResponse('Please verify your email address before you proceed')
         #The below if statement checks if the profile details are empty
         if len(str(request.user.profile.bio).strip()) > 0 :
             return redirect(reverse('home'))
