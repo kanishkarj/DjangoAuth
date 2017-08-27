@@ -16,30 +16,45 @@ from .models import Profile
 from django.views.generic import View
 from .serializers import UserToJson
 from django.core.urlresolvers import reverse
-from django.core.mail import EmailMessage
 from django.contrib.auth.models import User
 from rest_framework import generics
 from .serializers import UserSignUpSerializer
+from .tokens import account_activation_token, sendActivationMail
+from django.http import HttpResponse
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.contrib.auth.models import User
+from django.template.loader import render_to_string
+from django.utils.encoding import force_bytes, force_text
 
-class UserCreateView(generics.ListCreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSignUpSerializer
-
-    def perform_create(self, serializer):
-        serializer.save()
 
 @login_required
 def home(request):
     content = UserToJson(request.user)
-    
     return JsonResponse(content, safe=False)
+
+def activate(request, uidb64, token):
+    try:
+        uid = force_text(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+    if user is not None and account_activation_token.check_token(user, token):
+        user.is_active = True
+        user.save()        
+        # return redirect('home')
+        return HttpResponse('Thank you for your email confirmation. Now you can login your account.')
+    else:
+        return HttpResponse('Activation link is invalid!')
 
 
 class Registration(View):
     authentication_classes = (TokenAuthentication, BasicAuthentication)
     permission_classes = (IsAuthenticated,)
-
+    
     def get(self, request, *args, **kwargs):
+        
+        if request.user.is_active == False :
+            print("hello")
         #The below if statement checks if the profile details are empty
         if len(str(request.user.profile.bio).strip()) > 0 :
             return redirect(reverse('home'))
@@ -57,7 +72,6 @@ class Registration(View):
 
 @api_view(["POST"])
 def signup(request):
-    
     try :
         user = User.objects.create_user(
                                 username=request.data.get('username'),
@@ -65,13 +79,12 @@ def signup(request):
                                 password=request.POST.get('password'),
                                 first_name = request.POST.get('first_name'),
                                 last_name = request.POST.get('last_name'),
+                                is_active=False
                                 )
+        sendActivationMail(user)
     except Exception as e:
         return JsonResponse(str(e), safe=False)
 
-    email = EmailMessage('subject', 'body of the message', 'noreply@bottlenose.co', ['vitor@freitas.com'])
-    email.send()
-    
     content = UserToJson(user)
     return JsonResponse(content, safe=False)
 
@@ -87,9 +100,15 @@ def login(request):
     token, _ = Token.objects.get_or_create(user=user)
     return Response({"token": token.key})
 
-def logout(request):
-    auth.logout(request)
-    return JsonResponse({"token": "dgdfh"})    
+
+class LogOut(View):
+    authentication_classes = (TokenAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+    
+    def get(self, request, *args, **kwargs):
+        Token.objects.filter(user_id=request.user.id).delete()
+        auth.logout(request)
+        return JsonResponse({"token": "dgdfh"})
 
 def check(request):
     #token, _ = Token.objects.get_or_create(user=user)

@@ -33,5 +33,6 @@ def UserToJson(user):
         'bio': str(user.profile.bio),
         'address': str(user.profile.address),
         'birth_date': str(user.profile.birth_date),
+        'is_active': str(user.is_active),
     }
     return content
