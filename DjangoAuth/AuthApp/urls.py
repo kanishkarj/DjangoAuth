@@ -20,6 +20,7 @@ from . import views
 urlpatterns = [
     url(r'^login', views.login),
     url(r'^register', views.Registration.as_view()),
+    url(r'^accounts/', include('registration.backends.hmac.urls')),
     url(r'^logout', views.logout),
     url(r'^home/$', views.home, name='home'),
 ]

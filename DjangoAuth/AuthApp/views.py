@@ -16,10 +16,14 @@ from .models import Profile
 from django.views.generic import View
 from .serializers import UserToJson
 from django.core.urlresolvers import reverse
+from django.core.mail import EmailMessage
+
 
 @login_required
 def home(request):
     content = UserToJson(request.user)
+    email = EmailMessage('subject', 'body of the message', 'noreply@bottlenose.co', ['vitor@freitas.com'])
+    email.send()
     return JsonResponse(content, safe=False)
 
 
@@ -28,6 +32,7 @@ class Registration(View):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
+        #The below if statement checks if the profile details are empty
         if len(str(request.user.profile.bio).strip()) > 0 :
             return redirect(reverse('home'))
         else:
