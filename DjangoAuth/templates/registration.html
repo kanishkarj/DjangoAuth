@@ -17,9 +17,9 @@
 
 <body>
     welcome {{user.username}}
-    <form method="POST" >
+    <form method="POST" actions="{% url 'registerPost' %}">
             {% csrf_token %} 
-        <div class="form-group">
+        <div class="form-group" >
             <label for="bio">bio:</label>
             <input type="text" class="form-control" id="bio" name="bio">
         </div>

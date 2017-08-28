@@ -20,10 +20,13 @@ from . import views
 urlpatterns = [
     url(r'^login', views.login),
     url(r'^signup', views.signup),
-    url(r'^register', views.Registration.as_view()),
+    url(r'^register', views.registerPost),
     url(r'^accounts/', include('registration.backends.hmac.urls')),
     url(r'^logout', views.LogOut.as_view()),
     url(r'^home/$', views.home, name='home'),
+    url(r'^homes', views.home),
+    url(r'^update', views.update, name='update'),
+    url(r'^temp/$', views.temp),
     url(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
         views.activate, name='activate'),
 ]

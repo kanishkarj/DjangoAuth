@@ -24,3 +24,4 @@ def sendActivationMail(user):
     to_email = user.email
     email = EmailMessage(mail_subject, message, to=[to_email])
     email.send() 
+
